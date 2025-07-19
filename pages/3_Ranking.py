@@ -48,7 +48,7 @@ def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):
     return top_indices, cosine_sim[top_indices]
 
 # Filtro para uma vaga específica
-id_vaga_escolhida = 4045 # ou qualquer outro ID
+id_vaga_escolhida = 961 # ou qualquer outro ID
 vaga = df_vagas[df_vagas['id_todos_digitos'] == id_vaga_escolhida].iloc[0]
 texto_vaga = vaga['texto_vaga']
 

@@ -38,9 +38,20 @@ df_vagas['texto_vaga'] = (
     df_vagas['competencias_tokenizadas'].fillna('')
 )
 
-# Converter o id para string para evitar problemas de tipo
+# Converter id para string para evitar problemas de tipo
 df_vagas['id_todos_digitos'] = df_vagas['id_todos_digitos'].astype(str)
-id_vaga_escolhida = str(961)  # sempre string para combinar com a coluna
+
+# --- FILTRO INTERATIVO ---
+
+# Criar lista de opções (IDs) para o selectbox
+lista_ids = df_vagas['id_todos_digitos'].unique().tolist()
+
+# Selectbox para o usuário escolher a vaga
+id_vaga_escolhida = st.selectbox(
+    'Selecione o ID da vaga:',
+    options=lista_ids,
+    index=lista_ids.index('961') if '961' in lista_ids else 0
+)
 
 # Função de ranqueamento
 def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):
@@ -51,43 +62,42 @@ def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):
     top_indices = cosine_sim.argsort()[::-1][:top_n]
     return top_indices, cosine_sim[top_indices]
 
-# Filtro para vaga específica - verifica se existe antes de usar
+# Filtrar vaga selecionada e mostrar resultados
 vaga_filtrada = df_vagas[df_vagas['id_todos_digitos'] == id_vaga_escolhida]
 
 if vaga_filtrada.empty:
     st.error(f"Vaga com id {id_vaga_escolhida} não encontrada.")
-    st.stop()  # para o app aqui, evita erro depois
 else:
     vaga = vaga_filtrada.iloc[0]
     texto_vaga = vaga['texto_vaga']
 
-# Obter top 5 candidatos
-indices, scores = ranquear_candidatos(texto_vaga, df_candidatos['perfil_texto'].tolist())
-top_candidatos = df_candidatos.iloc[indices].copy()
-top_candidatos['score_aderencia'] = scores
+    # Obter top 5 candidatos
+    indices, scores = ranquear_candidatos(texto_vaga, df_candidatos['perfil_texto'].tolist())
+    top_candidatos = df_candidatos.iloc[indices].copy()
+    top_candidatos['score_aderencia'] = scores
 
-# Mostrar resultado no Streamlit
-colunas_necessarias = ['codigo_profissional', 'nome', 'perfil_texto', 'score_aderencia']
-for coluna in colunas_necessarias:
-    if coluna not in top_candidatos.columns:
-        st.warning(f"Coluna '{coluna}' não encontrada em df_candidatos.")
+    # Mostrar resultado no Streamlit
+    colunas_necessarias = ['codigo_profissional', 'nome', 'perfil_texto', 'score_aderencia']
+    for coluna in colunas_necessarias:
+        if coluna not in top_candidatos.columns:
+            st.warning(f"Coluna '{coluna}' não encontrada em df_candidatos.")
 
-st.subheader(f'Top 5 Candidatos para a Vaga {id_vaga_escolhida}')
-st.dataframe(top_candidatos[colunas_necessarias])
+    st.subheader(f'Top 5 Candidatos para a Vaga {id_vaga_escolhida}')
+    st.dataframe(top_candidatos[colunas_necessarias])
 
-# Criar o gráfico de barras horizontais
-plt.figure(figsize=(10, 6))
-sns.barplot(
-    x='score_aderencia',
-    y='nome',
-    data=top_candidatos.sort_values(by='score_aderencia', ascending=False),
-    palette='viridis'
-)
-plt.title(f'Top 5 Candidatos para a Vaga {id_vaga_escolhida} por Score de Aderência')
-plt.xlabel('Score de Aderência')
-plt.ylabel('Nome do Candidato')
-plt.xlim(0, 1)
-plt.tight_layout()
+    # Criar o gráfico de barras horizontais
+    plt.figure(figsize=(10, 6))
+    sns.barplot(
+        x='score_aderencia',
+        y='nome',
+        data=top_candidatos.sort_values(by='score_aderencia', ascending=False),
+        palette='viridis'
+    )
+    plt.title(f'Top 5 Candidatos para a Vaga {id_vaga_escolhida} por Score de Aderência')
+    plt.xlabel('Score de Aderência')
+    plt.ylabel('Nome do Candidato')
+    plt.xlim(0, 1)
+    plt.tight_layout()
 
-# Exibir gráfico no Streamlit
-st.pyplot(plt)
+    # Exibir gráfico no Streamlit
+    st.pyplot(plt)

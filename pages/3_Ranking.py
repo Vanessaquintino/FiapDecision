@@ -43,15 +43,27 @@ df_vagas['id_todos_digitos'] = df_vagas['id_todos_digitos'].astype(str)
 
 # --- FILTRO INTERATIVO ---
 
-# Criar lista de opções (IDs) para o selectbox
-lista_ids = df_vagas['id_todos_digitos'].unique().tolist()
+# Criar lista formatada com ID + título para o selectbox
+lista_ids_titulos = (
+    df_vagas['id_todos_digitos'] + ' - ' + df_vagas['titulo_padronizado'].fillna('')
+).tolist()
 
-# Selectbox para o usuário escolher a vaga
-id_vaga_escolhida = st.selectbox(
-    'Selecione o ID da vaga:',
-    options=lista_ids,
-    index=lista_ids.index('961') if '961' in lista_ids else 0
+# Definir índice padrão para o valor '961' (se existir)
+index_padrao = 0
+for i, item in enumerate(lista_ids_titulos):
+    if item.startswith('961'):
+        index_padrao = i
+        break
+
+# Selectbox para o usuário escolher a vaga com ID + título
+selecao = st.selectbox(
+    'Selecione a vaga (ID - Título):',
+    options=lista_ids_titulos,
+    index=index_padrao
 )
+
+# Extrair só o ID da string selecionada (antes do " - ")
+id_vaga_escolhida = selecao.split(' - ')[0]
 
 # Função de ranqueamento
 def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):

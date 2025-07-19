@@ -55,15 +55,6 @@ texto_vaga = vaga['texto_vaga']
 # Escolher uma vaga pelo título original
 titulo_vaga_escolhida = "Desenvolvedor SAP SD - 713"  # substitua pelo título desejado
 
-# Filtrar a vaga pelo título original
-vaga_filtrada = df_vagas[df_vagas['titulo_original'] == titulo_vaga_escolhida]
-if vaga_filtrada.empty:
-    st.error("Vaga não encontrada!")
-    st.stop()
-vaga = vaga_filtrada.iloc[0]
-texto_vaga = vaga['texto_vaga']
-id_vaga_escolhida = vaga['id_todos_digitos']  # pega o id correto da vaga filtrada
-
 # Obter top 5 candidatos
 indices, scores = ranquear_candidatos(texto_vaga, df_candidatos['perfil_texto'].tolist())
 top_candidatos = df_candidatos.iloc[indices].copy()

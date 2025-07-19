@@ -38,6 +38,10 @@ df_vagas['texto_vaga'] = (
     df_vagas['competencias_tokenizadas'].fillna('')
 )
 
+# Converter o id para string para evitar problemas de tipo
+df_vagas['id_todos_digitos'] = df_vagas['id_todos_digitos'].astype(str)
+id_vaga_escolhida = str(961)  # sempre string para combinar com a coluna
+
 # Função de ranqueamento
 def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):
     corpus = [vaga_texto] + candidatos_textos
@@ -47,13 +51,15 @@ def ranquear_candidatos(vaga_texto, candidatos_textos, top_n=5):
     top_indices = cosine_sim.argsort()[::-1][:top_n]
     return top_indices, cosine_sim[top_indices]
 
-# Filtro para uma vaga específica
-id_vaga_escolhida = 961 # ou qualquer outro ID
-vaga = df_vagas[df_vagas['id_todos_digitos'] == id_vaga_escolhida].iloc[0]
-texto_vaga = vaga['texto_vaga']
+# Filtro para vaga específica - verifica se existe antes de usar
+vaga_filtrada = df_vagas[df_vagas['id_todos_digitos'] == id_vaga_escolhida]
 
-# Escolher uma vaga pelo título original
-titulo_vaga_escolhida = "Desenvolvedor SAP SD - 713"  # substitua pelo título desejado
+if vaga_filtrada.empty:
+    st.error(f"Vaga com id {id_vaga_escolhida} não encontrada.")
+    st.stop()  # para o app aqui, evita erro depois
+else:
+    vaga = vaga_filtrada.iloc[0]
+    texto_vaga = vaga['texto_vaga']
 
 # Obter top 5 candidatos
 indices, scores = ranquear_candidatos(texto_vaga, df_candidatos['perfil_texto'].tolist())

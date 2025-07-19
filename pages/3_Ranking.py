@@ -5,8 +5,8 @@ import seaborn as sns
 from sklearn.feature_extraction.text import TfidfVectorizer
 import streamlit as st
 
-df_candidatos = pd.read_csv('candidatos_final.csv', on_bad_lines='skip', sep=';') 
-df_vagas = pd.read_csv('vagas_final.csv', on_bad_lines='skip', sep=';')
+df_candidatos = pd.read_csv('pages/candidatos_final.csv', on_bad_lines='skip', sep=';') 
+df_vagas = pd.read_csv('pages/vagas_final.csv', on_bad_lines='skip', sep=';')
 
 # Exibição lúdica das colunas
 col1, col2 = st.columns(2)

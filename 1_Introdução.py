@@ -15,5 +15,5 @@ Para o desenvolvimento desta proposta, iniciamos com uma análise criteriosa e u
 ---
 
 Todos os detalhes e materiais estão disponíveis no arquivo a seguir:  
-[Material](https://drive.google.com/file/d/1UughnOvWfghug9jBONMMgoQYFVZG5akn/view?usp=sharing)
+[Material](https://github.com/mayluciana/datathon-fase5/blob/main/Datathon%20Fase%2005%20-%20Proposta%20de%20trabalho.pdf)
 """)
